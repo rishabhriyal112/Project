@@ -102,7 +102,9 @@ def calculator():
             symbol, operation = operations[choice]
             result = operation(num1, num2)
             
-            print(f"\nResult: {num1} {symbol} {num2} = {result}")
+            # Add to history and display result
+            calculation = add_to_history(symbol, num1, num2, result)
+            print(f"\nResult: {calculation}")
             
         except KeyboardInterrupt:
             print("\n\nOperation cancelled by user.")
