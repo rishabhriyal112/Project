@@ -39,16 +39,49 @@ def get_number(prompt):
         except ValueError:
             print("Invalid input. Please enter a valid number.")
 
+def add_to_history(operation, x, y, result):
+    """Add a calculation to the history"""
+    calculation = f"{x} {operation} {y} = {result}"
+    calculation_history.append(calculation)
+    return calculation
+
+def view_history():
+    """Display calculation history"""
+    if not calculation_history:
+        print("\nNo history available.")
+        return
+    
+    print("\n=== Calculation History ===")
+    for i, calc in enumerate(calculation_history, 1):
+        print(f"{i}. {calc}")
+    print("=========================")
+
+def clear_history():
+    """Clear calculation history"""
+    global calculation_history
+    calculation_history = []
+    print("\nHistory cleared successfully!")
+
 def calculator():
     while True:
         display_menu()
         
         try:
-            choice = input("\nEnter your choice (1-6): ")
+            choice = input("\nEnter your choice (1-8): ")
             
-            if choice == '6':
+            if choice == '8':
                 print("\nThank you for using the Python Calculator. Goodbye!")
                 break
+                
+            if choice == '6':
+                view_history()
+                input("\nPress Enter to continue...")
+                continue
+                
+            if choice == '7':
+                clear_history()
+                input("\nPress Enter to continue...")
+                continue
                 
             if choice not in ['1', '2', '3', '4', '5']:
                 print("\nInvalid choice. Please select a number between 1 and 6.")
