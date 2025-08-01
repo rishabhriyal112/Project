@@ -15,17 +15,22 @@ def divide(x, y):
 def power(x, y):
     return x ** y
 
+# Global variable to store calculation history
+calculation_history = []
+
 def display_menu():
-    print("\n" + "="*30)
+    print("\n" + "="*40)
     print("      PYTHON CALCULATOR")
-    print("="*30)
+    print("="*40)
     print("1. Add (+)")
     print("2. Subtract (-)")
     print("3. Multiply (*)")
     print("4. Divide (/)")
     print("5. Power (^)")
-    print("6. Exit")
-    print("="*30)
+    print("6. View History")
+    print("7. Clear History")
+    print("8. Exit")
+    print("="*40)
 
 def get_number(prompt):
     while True:
