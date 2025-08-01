@@ -12,42 +12,67 @@ def divide(x, y):
         return "Error: Cannot divide by zero"
     return x / y
 
-def calculator():
-    print("Simple Calculator")
-    print("1. Add")
-    print("2. Subtract")
-    print("3. Multiply")
-    print("4. Divide")
-    print("5. Exit")
-    
+def power(x, y):
+    return x ** y
+
+def display_menu():
+    print("\n" + "="*30)
+    print("      PYTHON CALCULATOR")
+    print("="*30)
+    print("1. Add (+)")
+    print("2. Subtract (-)")
+    print("3. Multiply (*)")
+    print("4. Divide (/)")
+    print("5. Power (^)")
+    print("6. Exit")
+    print("="*30)
+
+def get_number(prompt):
     while True:
         try:
-            choice = input("\nEnter choice (1/2/3/4/5): ")
+            return float(input(prompt))
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
+
+def calculator():
+    while True:
+        display_menu()
+        
+        try:
+            choice = input("\nEnter your choice (1-6): ")
             
-            if choice == '5':
-                print("Goodbye!")
+            if choice == '6':
+                print("\nThank you for using the Python Calculator. Goodbye!")
                 break
                 
-            if choice not in ['1', '2', '3', '4']:
-                print("Invalid input. Please try again.")
+            if choice not in ['1', '2', '3', '4', '5']:
+                print("\nInvalid choice. Please select a number between 1 and 6.")
                 continue
                 
-            num1 = float(input("Enter first number: "))
-            num2 = float(input("Enter second number: "))
+            print("\nEnter two numbers:")
+            num1 = get_number("First number: ")
+            num2 = get_number("Second number: ")
             
-            if choice == '1':
-                print(f"{num1} + {num2} = {add(num1, num2)}")
-            elif choice == '2':
-                print(f"{num1} - {num2} = {subtract(num1, num2)}")
-            elif choice == '3':
-                print(f"{num1} * {num2} = {multiply(num1, num2)}")
-            elif choice == '4':
-                print(f"{num1} / {num2} = {divide(num1, num2)}")
-                
-        except ValueError:
-            print("Invalid input. Please enter numbers only.")
+            operations = {
+                '1': ("+", add),
+                '2': ("-", subtract),
+                '3': ("*", multiply),
+                '4': ("/", divide),
+                '5': ("^", power)
+            }
+            
+            symbol, operation = operations[choice]
+            result = operation(num1, num2)
+            
+            print(f"\nResult: {num1} {symbol} {num2} = {result}")
+            
+        except KeyboardInterrupt:
+            print("\n\nOperation cancelled by user.")
+            break
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"\nAn error occurred: {e}")
+        
+        input("\nPress Enter to continue...")
 
 if __name__ == "__main__":
     calculator()
