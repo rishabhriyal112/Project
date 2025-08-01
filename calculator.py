@@ -15,29 +15,41 @@ def divide(x, y):
 def power(x, y):
     return x ** y
 
+# Color codes for terminal output
+class Colors:
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 # Global variable to store calculation history
 calculation_history = []
 
 def display_menu():
-    print("\n" + "="*40)
-    print("      PYTHON CALCULATOR")
-    print("="*40)
-    print("1. Add (+)")
-    print("2. Subtract (-)")
-    print("3. Multiply (*)")
-    print("4. Divide (/)")
-    print("5. Power (^)")
-    print("6. View History")
-    print("7. Clear History")
-    print("8. Exit")
-    print("="*40)
+    print(f"\n{Colors.HEADER}{'='*50}{Colors.ENDC}")
+    print(f"{Colors.BOLD}{Colors.UNDERLINE}      PYTHON CALCULATOR{Colors.ENDC}")
+    print(f"{Colors.HEADER}{'='*50}{Colors.ENDC}")
+    print(f"{Colors.BLUE}1. Add (+){Colors.ENDC}")
+    print(f"{Colors.CYAN}2. Subtract (-){Colors.ENDC}")
+    print(f"{Colors.GREEN}3. Multiply (*){Colors.ENDC}")
+    print(f"{Colors.WARNING}4. Divide (/){Colors.ENDC}")
+    print(f"{Colors.FAIL}5. Power (^){Colors.ENDC}")
+    print(f"{Colors.HEADER}6. View History{Colors.ENDC}")
+    print(f"{Colors.HEADER}7. Clear History{Colors.ENDC}")
+    print(f"{Colors.HEADER}8. Exit{Colors.ENDC}")
+    print(f"{Colors.HEADER}{'='*50}{Colors.ENDC}")
 
 def get_number(prompt):
     while True:
         try:
-            return float(input(prompt))
+            return float(input(f"{Colors.CYAN}{prompt}{Colors.ENDC}"))
         except ValueError:
-            print("Invalid input. Please enter a valid number.")
+            print(f"{Colors.FAIL}Invalid input. Please enter a valid number.{Colors.ENDC}")
 
 def add_to_history(operation, x, y, result):
     """Add a calculation to the history"""
@@ -48,19 +60,19 @@ def add_to_history(operation, x, y, result):
 def view_history():
     """Display calculation history"""
     if not calculation_history:
-        print("\nNo history available.")
+        print(f"\n{Colors.WARNING}No history available.{Colors.ENDC}")
         return
     
-    print("\n=== Calculation History ===")
+    print(f"\n{Colors.HEADER}=== Calculation History ==={Colors.ENDC}")
     for i, calc in enumerate(calculation_history, 1):
-        print(f"{i}. {calc}")
-    print("=========================")
+        print(f"{Colors.GREEN}{i}. {calc}{Colors.ENDC}")
+    print(f"{Colors.HEADER}========================={Colors.ENDC}")
 
 def clear_history():
     """Clear calculation history"""
     global calculation_history
     calculation_history = []
-    print("\nHistory cleared successfully!")
+    print(f"\n{Colors.GREEN}History cleared successfully!{Colors.ENDC}")
 
 def calculator():
     while True:
@@ -84,7 +96,7 @@ def calculator():
                 continue
                 
             if choice not in ['1', '2', '3', '4', '5']:
-                print("\nInvalid choice. Please select a number between 1 and 6.")
+                print(f"\n{Colors.FAIL}Invalid choice. Please select a number between 1 and 8.{Colors.ENDC}")
                 continue
                 
             print("\nEnter two numbers:")
@@ -104,7 +116,7 @@ def calculator():
             
             # Add to history and display result
             calculation = add_to_history(symbol, num1, num2, result)
-            print(f"\nResult: {calculation}")
+            print(f"\n{Colors.GREEN}Result: {calculation}{Colors.ENDC}")
             
         except KeyboardInterrupt:
             print("\n\nOperation cancelled by user.")
