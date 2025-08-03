@@ -1,89 +1,56 @@
-# Python Mini Projects 🐍
+# My Projects Collection
 
-A collection of small, useful Python applications to help you learn and practice programming. Each project is self-contained and focuses on different programming concepts.
+A collection of my personal projects showcasing various programming skills and technologies. Each project is designed to solve specific problems while demonstrating clean code and best practices.
 
-## 📋 Projects
+## 🚀 Featured Projects
 
-### 1. [Advanced Calculator](/calculator)
-A feature-rich command-line calculator with history tracking and a colorful interface.
+### Python Projects
 
-**Features:**
-- Basic arithmetic operations (+, -, *, /)
-- Power (^) operation
-- Calculation history
-- Colorful terminal output
-- Error handling
+- **Calculator**
+  - Simple command-line calculator
+  - Supports basic arithmetic operations
+  - Clean, modular code structure
+  - Easy to extend with new operations
 
-**Run it:**
-```bash
-cd calculator
-python calculator.py
-```
+- **Task Manager**
+  - Command-line task management tool
+  - Add, view, and complete tasks
+  - Persistent storage using JSON
+  - Color-coded terminal output
 
-### 2. [Task Manager](/task-manager)
-A command-line task management application to help you organize your work.
+### Web Projects
 
-**Features:**
-- Add, view, and complete tasks
-- Set task priorities (high/medium/low)
-- Due date tracking
-- Colorful interface
-- Data persistence
+- **Todo List**
+  - Interactive todo list with add, complete, and delete functionality
+  - Filter tasks by All, Active, or Completed
+  - Responsive design that works on all devices
+  - Data persistence using localStorage
+  - Clean and modern UI with smooth animations
 
-**Run it:**
-```bash
-cd task-manager
-python task_manager.py
-```
+- **Todo App**
+  - Interactive todo list application
+  - Built with vanilla HTML, CSS, and JavaScript
+  - Responsive design for all devices
+  - Data persistence using localStorage
 
-## 🚀 Getting Started
+## 🛠️ Technologies Used
 
-1. Clone this repository:
-```bash
-git clone https://github.com/yourusername/python-mini-projects.git
-cd python-mini-projects
-```
+- Python 3.8+
+- HTML5, CSS3, JavaScript (ES6+)
+- JSON for data storage
+- Git for version control
 
-2. Navigate to any project directory and run the Python file:
-```bash
-cd calculator  # or task-manager
-python calculator.py  # or task_manager.py
-```
+## 📋 Getting Started
 
-## 📋 Project Structure
+1. Clone this repository
+2. Navigate to the project directory
+3. For Python projects: Run `python <script_name>.py`
+4. For web projects: Open `index.html` in a browser
 
-```
-python-mini-projects/
-├── calculator/           # Calculator project
-│   ├── calculator.py     # Main calculator script
-│   └── README.md         # Calculator documentation
-├── task-manager/         # Task Manager project
-│   ├── task_manager.py   # Main task manager script
-│   ├── requirements.txt  # Dependencies
-│   └── README.md         # Task Manager documentation
-├── .gitignore           # Git ignore file
-├── LICENSE              # MIT License
-└── README.md            # This file
-```
+## 📝 License
 
-## ⚙️ Requirements
-
-- Python 3.6+
-- For Task Manager:
-  - colorama (included in requirements.txt)
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Here's how you can contribute:
-
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct.
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
+Contributions are welcome! Please feel free to submit a Pull Request.
