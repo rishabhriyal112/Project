@@ -33,10 +33,3 @@ A collection of my personal projects showcasing various programming skills and t
 3. For Python projects: Run `python <script_name>.py`
 4. For web projects: Open `index.html` in a browser
 
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
