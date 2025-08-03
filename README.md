@@ -21,24 +21,10 @@ A collection of my personal projects showcasing various programming skills and t
 ### Web Projects
 
 - **Todo List**
-  - Interactive todo list with add, complete, and delete functionality
-  - Filter tasks by All, Active, or Completed
-  - Responsive design that works on all devices
-  - Data persistence using localStorage
-  - Clean and modern UI with smooth animations
-
-- **Todo App**
   - Interactive todo list application
   - Built with vanilla HTML, CSS, and JavaScript
   - Responsive design for all devices
   - Data persistence using localStorage
-
-## 🛠️ Technologies Used
-
-- Python 3.8+
-- HTML5, CSS3, JavaScript (ES6+)
-- JSON for data storage
-- Git for version control
 
 ## 📋 Getting Started
 
