@@ -20,6 +20,13 @@ A collection of my personal projects showcasing various programming skills and t
 
 ### Web Projects
 
+- **Note Taking App**
+  - Create, read, update, and delete notes with a clean interface
+  - Responsive design that works on all devices
+  - Data persistence using localStorage
+  - Rich text formatting support
+  - Search and filter functionality
+
 - **Todo List**
   - Interactive todo list with add, complete, and delete functionality
   - Filter tasks by All, Active, or Completed
