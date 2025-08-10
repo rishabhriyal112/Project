@@ -20,6 +20,12 @@ A collection of my personal projects showcasing various programming skills and t
 
 ### Web Projects
 
+- **Image Gallery**
+  - Responsive grid gallery with category filters (All, Nature, City, People)
+  - Lightbox with keyboard navigation (Esc/←/→) and scroll lock
+  - Lazy-loaded images and accessible, focusable cards
+  - Pure HTML, CSS, and JavaScript
+
 - **Pomodoro Timer**
   - Simple Pomodoro timer with Start/Pause/Reset controls
   - Switch between Pomodoro, Short Break, and Long Break
@@ -40,7 +46,6 @@ A collection of my personal projects showcasing various programming skills and t
   - Data persistence using localStorage
   - Clean and modern UI with smooth animations
 
-
 ## 🛠️ Technologies Used
 
 - Python 3.8+
@@ -54,5 +59,3 @@ A collection of my personal projects showcasing various programming skills and t
 2. Navigate to the project directory
 3. For Python projects: Run `python <script_name>.py`
 4. For web projects: Open `index.html` in a browser
-
-
