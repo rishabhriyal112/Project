@@ -32,11 +32,18 @@
     list.forEach(it => {
       const card = document.createElement('div');
       card.className = 'card';
+      card.tabIndex = 0; // keyboard focusable
       card.innerHTML = `
         <img src="${it.src}" alt="${it.caption}" loading="lazy" />
         <span class="badge">${it.cat}</span>
       `;
       card.addEventListener('click', () => openLightbox(it.idx));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          openLightbox(it.idx);
+        }
+      });
       galleryEl.appendChild(card);
     });
   }
@@ -56,11 +63,15 @@
     lbCaption.textContent = `${it.caption} · ${it.cat}`;
     lightboxEl.classList.add('open');
     lightboxEl.setAttribute('aria-hidden', 'false');
+    // lock scroll
+    document.body.style.overflow = 'hidden';
   }
 
   function closeLightbox(){
     lightboxEl.classList.remove('open');
     lightboxEl.setAttribute('aria-hidden', 'true');
+    // restore scroll
+    document.body.style.overflow = '';
   }
 
   function prev(){
