@@ -94,30 +94,41 @@
     if (e.key === 'ArrowRight') next();
   });
 
-  // Load from JSONPlaceholder
+  // Load from RapidAPI: real-time-image-search
   async function loadFromApi(){
+    const url = 'https://real-time-image-search.p.rapidapi.com/search?query=beach&limit=24&size=any&color=any&type=any&time=any&usage_rights=any&file_type=any&aspect_ratio=any&safe_search=off&region=us';
+    const options = {
+      method: 'GET',
+      headers: {
+        'x-rapidapi-key': 'ba813f2b2fmshd8b9eead5467a7ap1f2cc7jsn4f970bc22213',
+        'x-rapidapi-host': 'real-time-image-search.p.rapidapi.com'
+      }
+    };
     try {
-      // Fetch a limited set for performance
-      const res = await fetch('https://jsonplaceholder.typicode.com/photos?_limit=24');
+      const res = await fetch(url, options);
       if (!res.ok) throw new Error('Network response was not ok');
-      const data = await res.json();
-      // Map albumId to our categories
-      const catMap = (albumId) => {
-        const n = Number(albumId) % 3;
-        if (n === 0) return 'nature';
-        if (n === 1) return 'city';
-        return 'people';
-      };
-      items = data.map(d => ({
-        src: d.url, // large image
-        thumb: d.thumbnailUrl,
-        caption: d.title,
-        cat: catMap(d.albumId)
-      }));
+      // Some endpoints return text; try JSON first and fallback
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        const text = await res.text();
+        data = JSON.parse(text);
+      }
+      // Normalize: expect either { data: [...] } or an array
+      const arr = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
+      const cats = ['nature', 'city', 'people'];
+      items = arr.slice(0, 24).map((d, i) => {
+        const src = d.image || d.url || d.image_url || d.thumbnail || d.thumbnailUrl || '';
+        const caption = d.title || d.caption || d.source || d.domain || 'Image';
+        const cat = cats[i % cats.length];
+        return { src, caption, cat };
+      }).filter(it => Boolean(it.src));
+      if (items.length === 0) throw new Error('No images returned from API');
       render();
     } catch (err){
       console.error('Failed to load images', err);
-      galleryEl.innerHTML = '<p style="text-align:center;color:#666">Failed to load images. Please try again later.</p>';
+      galleryEl.innerHTML = '<p style="text-align:center;color:#666">Failed to load images from API. Please check your API key or try again later.</p>';
     }
   }
 
