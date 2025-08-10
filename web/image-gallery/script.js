@@ -8,17 +8,8 @@
   const lbPrev = document.getElementById('lbPrev');
   const lbNext = document.getElementById('lbNext');
 
-  // Demo items (Unsplash)
-  const items = [
-    {src:'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200&auto=format&fit=crop', cat:'nature', caption:'Mountain Sunrise'},
-    {src:'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop', cat:'city', caption:'City Skyline'},
-    {src:'https://images.unsplash.com/photo-1491553895911-0055eca6402d?q=80&w=1200&auto=format&fit=crop', cat:'people', caption:'Portrait in Light'},
-    {src:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=1200&auto=format&fit=crop', cat:'nature', caption:'Forest Path'},
-    {src:'https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1200&auto=format&fit=crop', cat:'nature', caption:'Desert Dunes'},
-    {src:'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=1200&auto=format&fit=crop', cat:'city', caption:'Old Town Street'},
-    {src:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1200&auto=format&fit=crop', cat:'people', caption:'Smiling Woman'},
-    {src:'https://images.unsplash.com/photo-1492571350019-22de08371fd3?q=80&w=1200&auto=format&fit=crop', cat:'people', caption:'Casual Style'},
-  ];
+  // Items loaded from API
+  let items = [];
 
   let currentIndex = 0;
   let activeFilter = 'all';
@@ -103,6 +94,34 @@
     if (e.key === 'ArrowRight') next();
   });
 
-  // Init
-  render();
+  // Load from JSONPlaceholder
+  async function loadFromApi(){
+    try {
+      // Fetch a limited set for performance
+      const res = await fetch('https://jsonplaceholder.typicode.com/photos?_limit=24');
+      if (!res.ok) throw new Error('Network response was not ok');
+      const data = await res.json();
+      // Map albumId to our categories
+      const catMap = (albumId) => {
+        const n = Number(albumId) % 3;
+        if (n === 0) return 'nature';
+        if (n === 1) return 'city';
+        return 'people';
+      };
+      items = data.map(d => ({
+        src: d.url, // large image
+        thumb: d.thumbnailUrl,
+        caption: d.title,
+        cat: catMap(d.albumId)
+      }));
+      render();
+    } catch (err){
+      console.error('Failed to load images', err);
+      galleryEl.innerHTML = '<p style="text-align:center;color:#666">Failed to load images. Please try again later.</p>';
+    }
+  }
+
+  // Initial state
+  galleryEl.innerHTML = '<p style="text-align:center;color:#666">Loading images…</p>';
+  loadFromApi();
 })();
