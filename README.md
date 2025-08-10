@@ -20,6 +20,12 @@ A collection of my personal projects showcasing various programming skills and t
 
 ### Web Projects
 
+- **Pomodoro Timer**
+  - Simple Pomodoro timer with Start/Pause/Reset controls
+  - Switch between Pomodoro, Short Break, and Long Break
+  - Customizable durations via settings
+  - Clean, responsive UI with status updates
+
 - **Note Taking App**
   - Create, read, update, and delete notes with a clean interface
   - Responsive design that works on all devices
