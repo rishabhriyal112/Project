@@ -20,6 +20,12 @@ A collection of my personal projects showcasing various programming skills and t
 
 ### Web Projects
 
+- **QR Code Generator**
+  - Generate QR codes from any text/URL
+  - Controls for size, margin, and error correction (L/M/Q/H)
+  - Live preview, PNG download, and autosave of inputs
+  - Pure HTML, CSS, and JavaScript using qrcode.js CDN
+
 - **Image Gallery**
   - Responsive grid gallery with category filters (All, Nature, City, People)
   - Lightbox with keyboard navigation (Esc/←/→) and scroll lock
