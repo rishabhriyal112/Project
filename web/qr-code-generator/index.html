@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Code Generator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>QR Code Generator</h1>
+    <div class="controls">
+      <label>
+        Text / URL
+        <input id="qrText" type="text" placeholder="Enter text or URL" />
+      </label>
+      <div class="row">
+        <label>
+          Size
+          <input id="qrSize" type="number" min="100" max="1024" value="256" />
+        </label>
+        <label>
+          Margin
+          <input id="qrMargin" type="number" min="0" max="8" value="2" />
+        </label>
+        <label>
+          Error Correction
+          <select id="qrEcc">
+            <option value="L">L (7%)</option>
+            <option value="M" selected>M (15%)</option>
+            <option value="Q">Q (25%)</option>
+            <option value="H">H (30%)</option>
+          </select>
+        </label>
+      </div>
+      <div class="buttons">
+        <button id="generate">Generate</button>
+        <button id="download">Download PNG</button>
+        <button id="clear">Clear</button>
+      </div>
+    </div>
+
+    <div class="preview">
+      <canvas id="qrCanvas" width="256" height="256" aria-label="QR code canvas"></canvas>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
