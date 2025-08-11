@@ -14,25 +14,6 @@
         Text / URL
         <input id="qrText" type="text" placeholder="Enter text or URL" />
       </label>
-      <div class="row">
-        <label>
-          Size
-          <input id="qrSize" type="number" min="100" max="1024" value="256" />
-        </label>
-        <label>
-          Margin
-          <input id="qrMargin" type="number" min="0" max="8" value="2" />
-        </label>
-        <label>
-          Error Correction
-          <select id="qrEcc">
-            <option value="L">L (7%)</option>
-            <option value="M" selected>M (15%)</option>
-            <option value="Q">Q (25%)</option>
-            <option value="H">H (30%)</option>
-          </select>
-        </label>
-      </div>
       <div class="buttons">
         <button id="generate">Generate</button>
         <button id="download">Download PNG</button>
@@ -41,7 +22,8 @@
     </div>
 
     <div class="preview">
-      <canvas id="qrCanvas" width="256" height="256" aria-label="QR code canvas"></canvas>
+      <canvas id="qrCanvas" width="512" height="512" aria-label="QR code canvas"></canvas>
+      <p id="qrStatus" style="margin:10px 0 0;color:#9ca3af;font-size:14px;text-align:center"></p>
     </div>
   </main>
 

@@ -1,13 +1,64 @@
 (function(){
   const input = document.getElementById('qrText');
-  const sizeInput = document.getElementById('qrSize');
-  const marginInput = document.getElementById('qrMargin');
-  const eccSelect = document.getElementById('qrEcc');
   const canvas = document.getElementById('qrCanvas');
+  const statusEl = document.getElementById('qrStatus');
   const btnGenerate = document.getElementById('generate');
   const btnDownload = document.getElementById('download');
   const btnClear = document.getElementById('clear');
   const LS_KEY = 'qr_code_generator_settings_v1';
+  const DEFAULTS = { size: 512, margin: 4, ecc: 'M' };
+
+  function encodeQuery(q){
+    return encodeURIComponent(q).replace(/%20/g,'+');
+  }
+
+  function apiUrl(text, size, margin){
+    const px = `${size}x${size}`;
+    // Using api.qrserver.com for fallback generation
+    return `https://api.qrserver.com/v1/create-qr-code/?size=${px}&margin=${margin}&data=${encodeQuery(text)}`;
+  }
+
+  async function drawFromImageUrl(url, size){
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0,size,size);
+        ctx.drawImage(img, 0, 0, size, size);
+        resolve();
+      };
+      img.onerror = () => reject(new Error('Failed to load QR PNG'));
+      img.src = url;
+    });
+  }
+
+  async function ensureQRCodeLib(){
+    if (statusEl) statusEl.textContent = 'Loading QR library…';
+    if (window.QRCode && typeof window.QRCode.toCanvas === 'function') return;
+    const cdns = [
+      'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js',
+      'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js'
+    ];
+    for (const src of cdns){
+      try {
+        await loadScript(src);
+        if (window.QRCode && typeof window.QRCode.toCanvas === 'function') return;
+      } catch {}
+    }
+    throw new Error('Failed to load QRCode library');
+  }
+
+  function loadScript(src){
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('Failed to load ' + src));
+      document.head.appendChild(s);
+    });
+  }
 
   function loadState(){
     try {
@@ -15,27 +66,30 @@
       if (!raw) return;
       const s = JSON.parse(raw);
       if (typeof s.text === 'string') input.value = s.text;
-      if (typeof s.size === 'number') sizeInput.value = s.size;
-      if (typeof s.margin === 'number') marginInput.value = s.margin;
-      if (typeof s.ecc === 'string') eccSelect.value = s.ecc;
     } catch {}
   }
 
   function saveState(){
     const state = {
       text: input.value.trim(),
-      size: Number(sizeInput.value) || 256,
-      margin: Number(marginInput.value) || 2,
-      ecc: eccSelect.value || 'M'
+      size: DEFAULTS.size,
+      margin: DEFAULTS.margin,
+      ecc: DEFAULTS.ecc
     };
     try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch {}
   }
 
   async function generate(){
+    let libLoaded = true;
+    try { await ensureQRCodeLib(); if (statusEl) statusEl.textContent = ''; }
+    catch (e){
+      console.warn('QRCode lib load failed, using API fallback.', e);
+      libLoaded = false;
+    }
     const text = input.value.trim();
-    const size = Math.max(100, Math.min(1024, Number(sizeInput.value) || 256));
-    const margin = Math.max(0, Math.min(8, Number(marginInput.value) || 2));
-    const ecc = eccSelect.value || 'M';
+    const size = DEFAULTS.size;
+    const margin = DEFAULTS.margin;
+    const ecc = DEFAULTS.ecc;
 
     canvas.width = size;
     canvas.height = size;
@@ -53,18 +107,35 @@
     }
 
     try {
-      await QRCode.toCanvas(canvas, text, {
-        errorCorrectionLevel: ecc,
-        width: size,
-        margin: margin,
-        color: {
-          dark: '#000000',
-          light: '#ffffff'
-        }
-      });
+      if (libLoaded){
+        await QRCode.toCanvas(canvas, text, {
+          errorCorrectionLevel: ecc,
+          width: size,
+          margin: margin,
+          color: { dark: '#000000', light: '#ffffff' }
+        });
+      } else {
+        const url = apiUrl(text, size, margin);
+        await drawFromImageUrl(url, size);
+      }
       saveState();
+      if (statusEl) statusEl.textContent = 'QR generated successfully.';
     } catch (err){
       console.error('Failed to generate QR', err);
+      if (!libLoaded){
+        if (statusEl) statusEl.textContent = 'Fallback API failed to generate QR.';
+      } else {
+        // Library failed after load; try fallback once
+        try {
+          const url = apiUrl(text, size, margin);
+          await drawFromImageUrl(url, size);
+          saveState();
+          if (statusEl) statusEl.textContent = 'QR generated via fallback API.';
+        } catch (e2){
+          console.error('Fallback API also failed', e2);
+          if (statusEl) statusEl.textContent = 'Failed to generate QR via both library and fallback API.';
+        }
+      }
     }
   }
 
@@ -75,32 +146,28 @@
 
   btnGenerate.addEventListener('click', generate);
   btnClear.addEventListener('click', clearAll);
-  btnDownload.addEventListener('click', () => {
+  btnDownload.addEventListener('click', async () => {
+    const name = (input.value.trim() || 'qr-code').slice(0, 50).replace(/\s+/g, '-');
     try {
       const dataURL = canvas.toDataURL('image/png');
       const a = document.createElement('a');
-      const name = (input.value.trim() || 'qr-code').slice(0, 50).replace(/\s+/g, '-');
       a.href = dataURL;
       a.download = `${name}.png`;
       document.body.appendChild(a);
       a.click();
       a.remove();
     } catch (err){
-      console.error('Download failed', err);
+      console.warn('Canvas toDataURL failed, offering direct PNG link.', err);
+      // Offer direct image link from fallback API
+      const url = apiUrl(input.value.trim() || 'hello', DEFAULTS.size, DEFAULTS.margin);
+      window.open(url, '_blank');
     }
   });
 
   // Generate live when values change
-  [input, sizeInput, marginInput, eccSelect].forEach(el => {
-    el.addEventListener('input', () => {
-      // debounce slightly for text
-      if (el === input){
-        clearTimeout(el.__debounce);
-        el.__debounce = setTimeout(generate, 250);
-      } else {
-        generate();
-      }
-    });
+  input.addEventListener('input', () => {
+    clearTimeout(input.__debounce);
+    input.__debounce = setTimeout(generate, 250);
   });
 
   // Enter to generate
