@@ -10,6 +10,7 @@ const closeBtn = document.querySelector('.close-btn');
 const transactionForm = document.getElementById('transaction-form');
 const transactionTypeBtns = document.querySelectorAll('.toggle-btn');
 const transactionTypeInput = document.getElementById('transaction-type');
+const loadingSpinner = document.getElementById('loadingSpinner');
 
 // Sample data (will be replaced with localStorage)
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
@@ -22,10 +23,32 @@ function init() {
 
 // Update UI with transaction data
 function updateUI() {
-    updateBalance();
-    renderTransactions();
-    updateCharts();
-    saveToLocalStorage();
+    showLoading();
+    try {
+        // Validate transactions data
+        if (!Array.isArray(transactions)) {
+            throw new Error('Invalid transactions data');
+        }
+        
+        // Update UI components
+        updateBalance();
+        renderTransactions();
+        updateCharts();
+        
+        // Save to localStorage with error handling
+        try {
+            saveToLocalStorage();
+        } catch (error) {
+            console.warn('Failed to save to localStorage:', error);
+            showNotification('Warning: Could not save data locally', 'warning');
+        }
+        
+    } catch (error) {
+        console.error('Error updating UI:', error);
+        showNotification('Error updating application data', 'error');
+    } finally {
+        hideLoading();
+    }
 }
 
 // Update balance, income, and expense
@@ -117,68 +140,165 @@ function saveToLocalStorage() {
 // Setup event listeners
 function setupEventListeners() {
     // Add transaction button
-    addTransactionBtn.addEventListener('click', () => {
-        transactionModal.style.display = 'flex';
-    });
-    
-    // Close modal
-    closeBtn.addEventListener('click', () => {
-        transactionModal.style.display = 'none';
-    });
-    
+    addTransactionBtn.addEventListener('click', openTransactionModal);
+
+    // Close modal button
+    closeBtn.addEventListener('click', closeTransactionModal);
+
     // Close modal when clicking outside
     window.addEventListener('click', (e) => {
         if (e.target === transactionModal) {
-            transactionModal.style.display = 'none';
+            closeTransactionModal();
         }
     });
-    
-    // Toggle transaction type
+
+    // Transaction type toggle buttons
     transactionTypeBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            transactionTypeBtuns.forEach(b => b.classList.remove('active'));
+            const type = btn.dataset.type;
+            transactionTypeInput.value = type;
+            
+            // Update active state
+            transactionTypeBtns.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            transactionTypeInput.value = btn.dataset.type;
         });
     });
+
+    // Form submission
+    transactionForm.addEventListener('submit', handleFormSubmit);
     
-    // Add new transaction
-    transactionForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const amount = parseFloat(document.getElementById('amount').value);
+    // Filter functionality
+    const filterInput = document.getElementById('filter');
+    filterInput.addEventListener('input', filterTransactions);
+    
+    // Sort functionality
+    const sortSelect = document.getElementById('sort');
+    sortSelect.addEventListener('change', filterTransactions);
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', handleKeyboardShortcuts);
+}
+
+// Handle form submission with error handling
+function handleFormSubmit(e) {
+    e.preventDefault();
+    
+    try {
+        const description = document.getElementById('description').value.trim();
+        const amountInput = document.getElementById('amount').value.trim();
+        const type = document.getElementById('transaction-type').value;
         const category = document.getElementById('category').value;
-        const description = document.getElementById('description').value;
-        const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
-        const type = transactionTypeInput.value;
+        const dateInput = document.getElementById('date').value;
+        
+        // Input validation
+        if (!description) {
+            throw new Error('Please enter a description');
+        }
+        
+        if (!amountInput) {
+            throw new Error('Please enter an amount');
+        }
+        
+        const amount = parseFloat(amountInput);
+        if (isNaN(amount) || amount <= 0) {
+            throw new Error('Please enter a valid positive amount');
+        }
+        
+        // Date validation
+        const date = dateInput || new Date().toISOString().split('T')[0];
+        const selectedDate = new Date(date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (selectedDate > today) {
+            throw new Error('Cannot add transactions for future dates');
+        }
         
         const transaction = {
-            id: Date.now().toString(),
-            amount: type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
-            category,
+            id: Date.now(),
             description,
-            date,
-            type
+            amount: type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
+            type,
+            category,
+            date
         };
         
+        // Add transaction with optimistic UI update
+        showLoading();
         transactions.unshift(transaction);
-        updateUI();
-        transactionForm.reset();
-        transactionModal.style.display = 'none';
-    });
+        
+        // Simulate API call with error handling
+        setTimeout(() => {
+            try {
+                // In a real app, this would be an API call
+                updateUI();
+                transactionForm.reset();
+                closeTransactionModal();
+                showNotification('Transaction added successfully!', 'success');
+            } catch (error) {
+                // Revert optimistic update on error
+                transactions.shift();
+                updateUI();
+                showNotification('Failed to add transaction. Please try again.', 'error');
+                console.error('Transaction error:', error);
+            } finally {
+                hideLoading();
+            }
+        }, 500);
+        
+    } catch (error) {
+        showNotification(error.message, 'error');
+    }
+}
+
+// Show notification to user
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
     
-    // Delete transaction
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('.delete-btn')) {
-            const id = e.target.closest('.delete-btn').dataset.id;
-            transactions = transactions.filter(t => t.id !== id);
-            updateUI();
-        }
-    });
+    document.body.appendChild(notification);
     
-    // Filter transactions
-    document.getElementById('filter-type').addEventListener('change', filterTransactions);
-    document.getElementById('filter-category').addEventListener('change', filterTransactions);
+    // Auto-remove notification after 3 seconds
+    setTimeout(() => {
+        notification.classList.add('fade-out');
+        notification.addEventListener('transitionend', () => notification.remove());
+    }, 3000);
+}
+
+// Open transaction modal
+function openTransactionModal() {
+    transactionModal.style.display = 'block';
+    document.getElementById('description').focus();
+}
+
+// Close transaction modal
+function closeTransactionModal() {
+    transactionModal.style.display = 'none';
+}
+
+// Handle keyboard shortcuts
+function handleKeyboardShortcuts(e) {
+    // Don't trigger shortcuts when typing in input fields
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+        return;
+    }
+
+    // Ctrl+Enter or Cmd+Enter to add new transaction
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        openTransactionModal();
+    }
+    
+    // Escape to close modal
+    if (e.key === 'Escape' && transactionModal.style.display === 'block') {
+        closeTransactionModal();
+    }
+    
+    // Space to generate new transaction (if needed)
+    if (e.key === ' ' && transactionModal.style.display !== 'block') {
+        e.preventDefault();
+        // Add any quick action for space if needed
+    }
 }
 
 // Filter transactions
@@ -206,4 +326,31 @@ function updateCharts() {
 }
 
 // Initialize the app when DOM is loaded
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+    showLoading();
+    // Simulate loading time (1 second)
+    setTimeout(() => {
+        init();
+        hideLoading();
+    }, 1000);
+});
+
+// Delete transaction event listener
+document.addEventListener('click', (e) => {
+    if (e.target.closest('.delete-btn')) {
+        const id = e.target.closest('.delete-btn').dataset.id;
+        transactions = transactions.filter(t => t.id !== id);
+        updateUI();
+    }
+});
+
+// Show loading spinner
+function showLoading() {
+    loadingSpinner.classList.add('active');
+}
+
+// Hide loading spinner
+function hideLoading() {
+    loadingSpinner.classList.remove('active');
+}
+
