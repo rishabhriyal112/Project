@@ -10,7 +10,6 @@ A collection of my personal projects showcasing various programming skills and t
   - Simple command-line calculator
   - Supports basic arithmetic operations
   - Clean, modular code structure
-  - Easy to extend with new operations
 
 - **Task Manager**
   - Command-line task management tool
